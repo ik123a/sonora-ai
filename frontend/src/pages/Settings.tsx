@@ -101,6 +101,10 @@ export function Settings() {
         id: nanoid(), name: 'Ollama (local)', apiKey: '', baseUrl: 'http://localhost:11434/v1',
         model: 'llama3', isDefault: providers.length === 0, kind: 'ollama',
       }])}>+ Add Ollama local</button>
+      <button className="pill px-4 py-2 hover:border-[#ffb800] hover:text-[#ffb800]" onClick={() => persist([...providers, {
+        id: nanoid(), name: 'NVIDIA NIM', apiKey: '', baseUrl: 'https://integrate.api.nvidia.com/v1',
+        model: 'meta/llama-3.2-11b-vision-instruct', isDefault: providers.length === 0, kind: 'openai-compatible',
+      }])}>+ Add NVIDIA NIM</button>
       {detail && <p className="text-sm text-neutral-300" role="status">{detail}</p>}
       <div className="font-mono text-[11px] uppercase tracking-[0.14em] text-neutral-600">Env fallback: OPENAI_API_KEY · ANTHROPIC_API_KEY · GEMINI_API_KEY · OPENROUTER_API_KEY</div>
     </div>

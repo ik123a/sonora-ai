@@ -28,6 +28,7 @@ export function detectProviderFromKey(key: string): DetectedProvider {
   if (k.startsWith('mistral-') || k.startsWith('mistral_')) return { kind: 'openai-compatible', name: 'Mistral', baseUrl: 'https://api.mistral.ai/v1' };
   if (k.startsWith('together-') || k.startsWith('tgp_')) return { kind: 'openai-compatible', name: 'Together AI', baseUrl: 'https://api.together.xyz/v1' };
   if (k.startsWith('sk-or-')) return { kind: 'openai-compatible', name: 'OpenRouter', baseUrl: 'https://openrouter.ai/api/v1' };
+  if (k.startsWith('nvapi-')) return { kind: 'openai-compatible', name: 'NVIDIA NIM', baseUrl: 'https://integrate.api.nvidia.com/v1' };
   if (k.startsWith('sk-')) return { kind: 'openai-compatible', name: 'OpenAI', baseUrl: 'https://api.openai.com/v1' };
   return { kind: 'openai-compatible', name: 'Custom endpoint', baseUrl: '' };
 }
