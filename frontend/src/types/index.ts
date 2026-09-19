@@ -9,6 +9,7 @@ export interface Track {
   trackNo?: number;
   discNo?: number;
   duration: number;
+  isrc?: string;
   bitrate?: number;
   codec?: string;
   artworkUrl?: string;

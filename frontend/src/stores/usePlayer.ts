@@ -31,6 +31,7 @@ export const usePlayer = create<PlayerState>((set, get) => ({
   setQueue: (tracks, start = 0) => {
     const track = tracks[start] ?? null;
     set({ queue: tracks, index: start, currentTrack: track });
+    void import('../services/scrobble').then(async (m) => { await m.trackEnded(); if (track) await m.trackStarted(track); });
     if (track) void engine.play(track).then(() => set({ isPlaying: true })).catch(() => set({ isPlaying: false }));
   },
   toggle: () => {
@@ -47,6 +48,7 @@ export const usePlayer = create<PlayerState>((set, get) => ({
     if (n >= queue.length) { if (repeat === 'all') n = 0; else { set({ isPlaying: false }); return; } }
     const track = queue[n];
     set({ index: n, currentTrack: track });
+    void import('../services/scrobble').then(async (m) => { await m.trackEnded(); await m.trackStarted(track); });
     void engine.play(track).then(() => set({ isPlaying: true }));
   },
   prev: () => {
@@ -55,6 +57,7 @@ export const usePlayer = create<PlayerState>((set, get) => ({
     const track = queue[n];
     if (!track) return;
     set({ index: n, currentTrack: track });
+    void import('../services/scrobble').then(async (m) => { await m.trackEnded(); await m.trackStarted(track); });
     void engine.play(track).then(() => set({ isPlaying: true }));
   },
   seek: (sec) => engine.seek(sec),
@@ -63,4 +66,10 @@ export const usePlayer = create<PlayerState>((set, get) => ({
   setRepeat: (r) => { engine.repeat = r; set({ repeat: r }); },
 }));
 
-engine.on({ onTrackEnd: () => usePlayer.getState().next() });
+engine.on({
+  onTrackEnd: () => {
+    void import('../stores/useSleep').then((m) => {
+      if (!m.handleTrackEnded()) usePlayer.getState().next();
+    });
+  },
+});

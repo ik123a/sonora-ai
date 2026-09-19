@@ -2,9 +2,11 @@ import type { MusicProvider } from './types';
 import { localProvider } from './local';
 import { musicBrainzProvider } from './musicbrainz';
 import { jamendoProvider } from './jamendo';
+import { subsonicProvider } from './subsonic';
+import { spotifyDataProvider } from './spotify';
 import { mockProvider } from './mock';
 
-const all: MusicProvider[] = [localProvider, musicBrainzProvider, jamendoProvider, mockProvider];
+const all: MusicProvider[] = [localProvider, musicBrainzProvider, spotifyDataProvider, subsonicProvider, jamendoProvider, mockProvider];
 
 export const registry = {
   list(): MusicProvider[] { return all; },

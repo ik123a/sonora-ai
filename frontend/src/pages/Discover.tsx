@@ -1,12 +1,17 @@
 import { useLibrary } from '../stores/useLibrary';
 import { usePlayer } from '../stores/usePlayer';
-import { recommend } from '../ai/recommendations';
+import { buildRadio, recommend } from '../ai/recommendations';
 
 export function Discover() {
   const { tracks } = useLibrary();
   const { setQueue, currentTrack } = usePlayer();
   const picks = recommend(currentTrack?.id, 12);
   const moods = ['Chill', 'Focus', 'Workout', 'Party', 'Sleep', 'Nostalgic'];
+
+  function startRadio(): void {
+    const radio = buildRadio(currentTrack?.id, 25).map((r) => r.track);
+    if (radio.length) setQueue(radio, 0);
+  }
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Discover</h1>
@@ -21,6 +26,13 @@ export function Discover() {
           ))}
           {picks.length === 0 && <p className="text-sm text-gray-400">Import music to get recommendations.</p>}
         </div>
+      </section>
+      <section>
+        <div className="eyebrow mb-3">Smart radio</div>
+        <button onClick={startRadio} className="btn-amber px-6 py-2.5 text-sm">
+          ▶ Start Smart Radio{currentTrack ? ` — from ${currentTrack.title}` : ' — from your taste'}
+        </button>
+        <p className="mt-1 font-mono text-[11px] text-neutral-500">Weighted by artist affinity · genre · recency — max 3 per artist</p>
       </section>
       <section>
         <div className="eyebrow mb-3">Mood mixes</div>

@@ -74,6 +74,23 @@ export const tools: ToolDef[] = [
     run: async () => ok('History', [...useLibrary.getState().tracks].sort((a, b) => (b.playCount ?? 0) - (a.playCount ?? 0)).slice(0, 10)) },
   { name: 'change_equalizer', description: 'EQ preset', permission: 'PLAYBACK', dangerous: false,
     run: async (a) => { const g = EQ_PRESETS[String(a.preset ?? 'Flat')] ?? EQ_PRESETS.Flat; engine.setEQ([...g], 0); return ok(`EQ → ${a.preset}`); } },
+  { name: 'set_sleep_timer', description: 'Stop playback after N minutes (0 cancels)', permission: 'PLAYBACK', dangerous: false,
+    run: async (a) => {
+      const mod = await import('../stores/useSleep');
+      const min = Number(a.minutes ?? 0);
+      if (min <= 0) { mod.useSleep.getState().cancel(); return ok('Sleep timer cancelled'); }
+      mod.useSleep.getState().setMinutes(min);
+      return ok(`Sleep timer set: ${min} minutes`);
+    } },
+  { name: 'start_radio', description: 'Build Smart Radio queue from current taste and play it', permission: 'PLAYBACK', dangerous: false,
+    run: async (a) => {
+      const { buildRadio } = await import('./recommendations');
+      const { usePlayer } = await import('../stores/usePlayer');
+      const picks = buildRadio(usePlayer.getState().currentTrack?.id, Number(a.limit ?? 25)).map((r) => r.track);
+      if (!picks.length) return fail('Library empty — import music first');
+      usePlayer.getState().setQueue(picks, 0);
+      return ok(`Smart Radio playing: ${picks.length} tracks`, { count: picks.length });
+    } },
   { name: 'analyze_library', description: 'Top artists/genres/stats', permission: 'READ', dangerous: false,
     run: async () => {
       const tracks = useLibrary.getState().tracks;

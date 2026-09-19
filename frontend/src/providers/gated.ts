@@ -21,3 +21,5 @@ export const spotifyProvider = needAuth('Spotify');
 export const youtubeProvider = needAuth('YouTube');
 export const tidalProvider = needAuth('Tidal');
 export const deezerProvider = needAuth('Deezer');
+export const appleProvider = needAuth('Apple Music');
+export const ytmusicProvider = needAuth('YouTube Music');

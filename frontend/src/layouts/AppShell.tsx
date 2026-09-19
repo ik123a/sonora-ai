@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { usePlayer } from '../stores/usePlayer';
 import { useAI } from '../stores/useAI';
 import { useOffline } from '../hooks/useOffline';
+import { SleepButton } from '../components/SleepButton';
 
 const NAV = [
   ['/', 'Home'], ['/discover', 'Discover'], ['/search', 'Search'], ['/library', 'Library'],
@@ -61,6 +62,7 @@ export function AppShell() {
             <button className="btn-amber px-5 py-2 text-base" onClick={toggle} aria-label="Play or pause">{isPlaying ? '⏸' : '▶'}</button>
             <button className="rounded-full p-2 text-neutral-300 hover:bg-white/10 hover:text-white" onClick={next} aria-label="Next">⏭</button>
             <input type="range" min={0} max={1} step={0.01} value={volume} onChange={(e) => setVolume(Number(e.target.value))} aria-label="Volume" className="w-24 accent-[#ffb800]" />
+            <SleepButton />
             <button className="pill px-4 py-2 text-[#f5f4f0] transition-colors hover:border-[#ffb800] hover:text-[#ffb800]" onClick={() => setAiOpen(!aiOpen)}>Ask Sonora AI</button>
           </div>
         </footer>

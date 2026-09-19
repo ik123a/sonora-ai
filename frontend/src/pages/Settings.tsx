@@ -2,7 +2,40 @@ import { useState } from 'react';
 import { nanoid } from 'nanoid';
 import { detectProviderFromKey, fetchModels, loadProviders, saveProviders, testConnection } from '../ai/providers';
 import { MODEL_CATALOG } from '../ai/models';
+import { loadScrobbleSettings, saveScrobbleSettings } from '../services/scrobble';
 import type { AIProviderConfig } from '../types';
+
+export function ScrobbleSettings() {
+  const [s, setS] = useState(() => loadScrobbleSettings());
+  const [saved, setSaved] = useState('');
+  function persist(v: typeof s): void { setS(v); saveScrobbleSettings(v); setSaved('Saved locally.'); }
+  return (
+    <div className="card space-y-2 p-4">
+      <div className="font-semibold">Scrobbling <span className="pill ml-1 border-sky-500/50 px-2 py-0.5 text-sky-300">ListenBrainz · Last.fm</span></div>
+      <p className="text-xs text-neutral-400">Plays scrobble after 30s and half the track (min 4 min rule). LibreFM works via a custom base URL.</p>
+      <label className="block text-xs text-neutral-400">ListenBrainz token
+        <input value={s.listenbrainzToken} onChange={(e) => persist({ ...s, listenbrainzToken: e.target.value })} type="password" placeholder="From listenbrainz.org settings" className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 font-mono text-xs" aria-label="ListenBrainz token" />
+      </label>
+      <div className="flex gap-2">
+        <label className="flex-1 text-xs text-neutral-400">Last.fm API key
+          <input value={s.lastfmApiKey} onChange={(e) => persist({ ...s, lastfmApiKey: e.target.value })} className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 font-mono text-xs" aria-label="Last.fm API key" />
+        </label>
+        <label className="flex-1 text-xs text-neutral-400">Shared secret
+          <input value={s.lastfmSecret} onChange={(e) => persist({ ...s, lastfmSecret: e.target.value })} type="password" className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 font-mono text-xs" aria-label="Last.fm secret" />
+        </label>
+      </div>
+      <div className="flex gap-2">
+        <label className="flex-1 text-xs text-neutral-400">Session key
+          <input value={s.lastfmSession} onChange={(e) => persist({ ...s, lastfmSession: e.target.value })} type="password" placeholder="auth.getSession result" className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 font-mono text-xs" aria-label="Last.fm session key" />
+        </label>
+        <label className="flex-1 text-xs text-neutral-400">Base URL
+          <input value={s.lastfmBaseUrl} onChange={(e) => persist({ ...s, lastfmBaseUrl: e.target.value })} className="mt-1 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 font-mono text-xs" aria-label="Last.fm base URL" />
+        </label>
+      </div>
+      {saved && <p className="font-mono text-[11px] text-emerald-300" role="status">{saved}</p>}
+    </div>
+  );
+}
 
 export function Settings() {
   const [providers, setProviders] = useState<AIProviderConfig[]>(() => loadProviders());
@@ -106,6 +139,7 @@ export function Settings() {
         model: 'meta/llama-3.2-11b-vision-instruct', isDefault: providers.length === 0, kind: 'openai-compatible',
       }])}>+ Add NVIDIA NIM</button>
       {detail && <p className="text-sm text-neutral-300" role="status">{detail}</p>}
+      <ScrobbleSettings />
       <div className="font-mono text-[11px] uppercase tracking-[0.14em] text-neutral-600">Env fallback: OPENAI_API_KEY · ANTHROPIC_API_KEY · GEMINI_API_KEY · OPENROUTER_API_KEY</div>
     </div>
   );

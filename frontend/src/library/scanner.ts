@@ -28,6 +28,7 @@ export async function filesToTracks(files: FileList | File[]): Promise<{ tracks:
         trackNo: c.track.no ?? undefined,
         discNo: c.disk.no ?? undefined,
         duration: meta.format.duration ?? 0,
+        isrc: Array.isArray(c.isrc) ? c.isrc[0] : c.isrc ?? undefined,
         bitrate: meta.format.bitrate ? Math.round(meta.format.bitrate / 1000) : undefined,
         codec: meta.format.codec,
         artworkUrl: undefined,
