@@ -1,3 +1,4 @@
+import md5 from 'blueimp-md5';
 import type { Track } from '../types';
 
 export interface ScrobbleSettings {
@@ -47,16 +48,7 @@ export async function submitListenBrainz(token: string, t: Track): Promise<void>
 async function lastfmSign(params: Record<string, string>, secret: string): Promise<string> {
   const keys = Object.keys(params).filter((k) => k !== 'format').sort();
   const raw = keys.map((k) => `${k}${params[k]}`).join('') + secret;
-  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(raw));
-  void digest;
-  let md5 = '';
-  try {
-    const mod = await import('blueimp-md5');
-    md5 = (mod.default as (s: string) => string)(raw);
-  } catch {
-    throw new Error('Last.fm signing needs the blueimp-md5 package — run npm install blueimp-md5.');
-  }
-  return md5;
+  return md5(raw);
 }
 
 export async function submitLastFm(s: ScrobbleSettings, t: Track): Promise<void> {
