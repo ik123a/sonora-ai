@@ -11,7 +11,7 @@ export function Discover() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Discover</h1>
       <section>
-        <h2 className="mb-2 font-semibold">Made For You</h2>
+        <div className="eyebrow mb-3">Made for you</div>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
           {picks.map((t) => (
             <button key={t.id} onClick={() => setQueue([t], 0)} className="rounded-xl bg-white/5 p-3 text-left hover:bg-white/10">
@@ -23,10 +23,10 @@ export function Discover() {
         </div>
       </section>
       <section>
-        <h2 className="mb-2 font-semibold">Mood Mixes</h2>
+        <div className="eyebrow mb-3">Mood mixes</div>
         <div className="flex flex-wrap gap-2">
           {moods.map((m) => (
-            <button key={m} onClick={() => setQueue(tracks, 0)} className="rounded-full border border-white/15 px-4 py-2 text-sm hover:bg-white/5">{m}</button>
+            <button key={m} onClick={() => setQueue(tracks, 0)} className="pill px-5 py-2.5 text-neutral-300 transition-colors hover:border-[#ffb800] hover:text-[#ffb800]">{m}</button>
           ))}
         </div>
       </section>

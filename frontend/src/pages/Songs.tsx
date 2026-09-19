@@ -25,7 +25,7 @@ export function Songs() {
           <button className="min-w-0 flex-1 truncate text-left" onClick={() => setQueue(list, i)}>
             <span className="font-medium">{t.title}</span> <span className="text-sm text-gray-400">· {t.artist} · {t.album}</span>
           </button>
-          <button onClick={() => toggleLike(t.id)} aria-label={t.liked ? 'Unlike' : 'Like'} className={t.liked ? 'text-pink-400' : 'text-gray-500'}>{t.liked ? '♥' : '♡'}</button>
+          <button onClick={() => toggleLike(t.id)} aria-label={t.liked ? 'Unlike' : 'Like'} className={t.liked ? 'text-[#ffb800]' : 'text-neutral-600 hover:text-neutral-300'}>{t.liked ? '♥' : '♡'}</button>
         </div>
       ))}
       {list.length === 0 && <p className="text-sm text-gray-400">No songs match.</p>}

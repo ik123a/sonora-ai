@@ -15,14 +15,21 @@ export function Visualizer({ mode = 'bars' }: { mode?: 'bars' | 'minimal' }) {
           const data = engine.spectrum();
           ctx.clearRect(0, 0, c.width, c.height);
           if (mode === 'minimal') {
-            ctx.fillStyle = '#8b5cf6';
+            ctx.fillStyle = '#ffb800';
             const avg = data.reduce((a, b) => a + b, 0) / data.length;
             ctx.beginPath(); ctx.arc(c.width / 2, c.height / 2, 8 + avg * 30, 0, Math.PI * 2); ctx.fill();
           } else {
             const w = c.width / data.length;
             data.forEach((v, i) => {
-              ctx.fillStyle = '#8b5cf6';
-              ctx.fillRect(i * w, c.height - v * c.height, w - 1, v * c.height);
+              const g = ctx.createLinearGradient(0, c.height, 0, 0);
+              g.addColorStop(0, '#ffb800');
+              g.addColorStop(1, '#ff6a00');
+              ctx.fillStyle = g;
+              const h = Math.max(2, v * c.height);
+              const x = i * w;
+              ctx.beginPath();
+              ctx.roundRect(x, c.height - h, w - 1, h, 2);
+              ctx.fill();
             });
           }
         }
