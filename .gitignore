@@ -1,0 +1,8 @@
+node_modules/
+frontend/dist/
+src-tauri/target/
+src-tauri/gen/
+.env
+*.db
+*.log
+.DS_Store
