@@ -9,6 +9,25 @@ export function isSupported(name: string): boolean {
   return SUPPORTED.includes(ext);
 }
 
+/**
+ * Embedded cover art lives in `common.picture`, an ARRAY (a file can carry
+ * several images: cover, back, artist photo, small icon). `music-metadata-browser`
+ * hands back raw bytes, so the chosen one has to become a URL the <img> can
+ * load. This was previously discarded (`artworkUrl: undefined`), which is why
+ * every surface in the app rendered bare text with no album identity at all.
+ *
+ * Picks the largest picture rather than `picture[0]`: the front cover is
+ * normally the biggest, while index 0 is often a tiny embedded icon.
+ */
+function pictureToUrl(pictures: Array<{ data: Uint8Array; format: string }> | undefined): string | undefined {
+  const best = pictures
+    ?.filter((p) => p?.data?.length)
+    .sort((a, b) => b.data.length - a.data.length)[0];
+  if (!best) return undefined;
+  const mime = best.format ? `image/${best.format}` : 'image/jpeg';
+  return URL.createObjectURL(new Blob([best.data as BlobPart], { type: mime }));
+}
+
 export async function filesToTracks(files: FileList | File[]): Promise<{ tracks: Track[]; skipped: Array<{ name: string; reason: string }> }> {
   const list = Array.from(files).filter((f) => isSupported(f.name));
   const tracks: Track[] = [];
@@ -31,7 +50,7 @@ export async function filesToTracks(files: FileList | File[]): Promise<{ tracks:
         isrc: Array.isArray(c.isrc) ? c.isrc[0] : c.isrc ?? undefined,
         bitrate: meta.format.bitrate ? Math.round(meta.format.bitrate / 1000) : undefined,
         codec: meta.format.codec,
-        artworkUrl: undefined,
+        artworkUrl: pictureToUrl(c.picture),
         filePath: URL.createObjectURL(file),
         source: 'local',
         addedAt: Date.now(),
