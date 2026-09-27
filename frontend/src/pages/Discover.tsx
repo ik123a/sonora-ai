@@ -1,6 +1,7 @@
 import { useLibrary } from '../stores/useLibrary';
 import { usePlayer } from '../stores/usePlayer';
 import { buildRadio, recommend } from '../ai/recommendations';
+import { PageHead, Tile } from '../components/Tile';
 
 export function Discover() {
   const { tracks } = useLibrary();
@@ -13,32 +14,51 @@ export function Discover() {
     if (radio.length) setQueue(radio, 0);
   }
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Discover</h1>
+    <div className="space-y-8">
+      <PageHead title="Discover" />
       <section>
-        <div className="eyebrow mb-3">Made for you</div>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        <div className="eyebrow mb-4">Made for you</div>
+        <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
           {picks.map((t) => (
-            <button key={t.id} onClick={() => setQueue([t], 0)} className="rounded-xl bg-white/5 p-3 text-left hover:bg-white/10">
-              <div className="truncate text-sm font-medium">{t.title}</div>
-              <div className="truncate text-xs text-gray-400">{t.artist}</div>
-            </button>
+            <Tile
+              key={t.id}
+              src={t.artworkUrl}
+              seed={`${t.title}-${t.album}`}
+              title={t.title}
+              meta={t.artist}
+              onClick={() => setQueue([t], 0)}
+            />
           ))}
-          {picks.length === 0 && <p className="text-sm text-gray-400">Import music to get recommendations.</p>}
         </div>
+        {picks.length === 0 && (
+          <p className="text-sm" style={{ color: 'var(--sonora-dim)' }}>Import music to get recommendations.</p>
+        )}
       </section>
       <section>
-        <div className="eyebrow mb-3">Smart radio</div>
+        <div className="eyebrow mb-4">Smart radio</div>
+        {/* The single amber action on this page — everything else is ghost. */}
         <button onClick={startRadio} className="btn-amber px-6 py-2.5 text-sm">
-          ▶ Start Smart Radio{currentTrack ? ` — from ${currentTrack.title}` : ' — from your taste'}
+          ▶ Start Smart Radio
         </button>
-        <p className="mt-1 font-mono text-[11px] text-neutral-500">Weighted by artist affinity · genre · recency — max 3 per artist</p>
+        <p className="mt-2 text-sm" style={{ color: 'var(--sonora-muted)' }}>
+          {currentTrack ? `Seeded from “${currentTrack.title}”` : 'Seeded from your listening taste'}
+        </p>
+        <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.14em]" style={{ color: 'var(--sonora-dim)' }}>
+          Weighted by artist affinity · genre · recency — max 3 per artist
+        </p>
       </section>
       <section>
-        <div className="eyebrow mb-3">Mood mixes</div>
+        <div className="eyebrow mb-4">Mood mixes</div>
         <div className="flex flex-wrap gap-2">
           {moods.map((m) => (
-            <button key={m} onClick={() => setQueue(tracks, 0)} className="pill px-5 py-2.5 text-neutral-300 transition-colors hover:border-[#ffb800] hover:text-[#ffb800]">{m}</button>
+            <button
+              key={m}
+              type="button"
+              onClick={() => setQueue(tracks, 0)}
+              className="pill btn-ghost px-5 py-2.5"
+            >
+              {m}
+            </button>
           ))}
         </div>
       </section>

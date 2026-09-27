@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useLibrary } from '../stores/useLibrary';
 import { usePlayer } from '../stores/usePlayer';
+import { PageHead, TrackRow } from '../components/Tile';
 
 export function Songs() {
   const { tracks, toggleLike } = useLibrary();
@@ -12,23 +13,59 @@ export function Songs() {
     return [...f].sort((a, b) => sort === 'artist' ? a.artist.localeCompare(b.artist) : sort === 'recent' ? b.addedAt - a.addedAt : a.title.localeCompare(b.title));
   }, [tracks, q, sort]);
   return (
-    <div className="space-y-3">
-      <h1 className="text-2xl font-bold">Songs ({list.length})</h1>
-      <div className="flex gap-2">
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Filter songs…" className="flex-1 rounded-lg bg-white/5 px-3 py-2" aria-label="Filter songs" />
-        <select value={sort} onChange={(e) => setSort(e.target.value as typeof sort)} className="rounded-lg bg-white/5 px-2" aria-label="Sort songs">
-          <option value="title">Title</option><option value="artist">Artist</option><option value="recent">Recent</option>
-        </select>
-      </div>
-      {list.map((t, i) => (
-        <div key={t.id} className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-white/5">
-          <button className="min-w-0 flex-1 truncate text-left" onClick={() => setQueue(list, i)}>
-            <span className="font-medium">{t.title}</span> <span className="text-sm text-gray-400">· {t.artist} · {t.album}</span>
-          </button>
-          <button onClick={() => toggleLike(t.id)} aria-label={t.liked ? 'Unlike' : 'Like'} className={t.liked ? 'text-[#ffb800]' : 'text-neutral-600 hover:text-neutral-300'}>{t.liked ? '♥' : '♡'}</button>
+    <div className="space-y-6">
+      <PageHead title="Songs" count={list.length} />
+      <div className="flex flex-wrap items-center gap-3">
+        <label className="flex min-w-0 flex-1 items-center gap-2 rounded-full border px-4 py-2"
+          style={{ borderColor: 'var(--sonora-line-strong)', background: 'var(--sonora-panel)' }}>
+          <span className="font-mono text-[11px] uppercase tracking-[0.18em]" style={{ color: 'var(--sonora-dim)' }} aria-hidden>Find</span>
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Title, artist or album…"
+            aria-label="Filter songs"
+            className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:opacity-60"
+          />
+        </label>
+        <div className="flex items-center gap-1" role="group" aria-label="Sort songs">
+          {(['title', 'artist', 'recent'] as const).map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => setSort(s)}
+              aria-pressed={sort === s}
+              className="pill px-4 py-2 transition-colors"
+              style={{
+                color: sort === s ? 'var(--sonora-accent)' : 'var(--sonora-muted)',
+                borderColor: sort === s ? 'var(--sonora-accent)' : 'var(--sonora-line-strong)',
+              }}
+            >
+              {s}
+            </button>
+          ))}
         </div>
-      ))}
-      {list.length === 0 && <p className="text-sm text-gray-400">No songs match.</p>}
+      </div>
+      <div className="space-y-0.5">
+        {list.map((t, i) => (
+          <TrackRow
+            key={t.id}
+            index={i}
+            title={t.title}
+            artist={t.artist}
+            album={t.album}
+            duration={t.duration}
+            artworkUrl={t.artworkUrl}
+            liked={t.liked}
+            onToggleLike={() => toggleLike(t.id)}
+            onPlay={() => setQueue(list, i)}
+          />
+        ))}
+      </div>
+      {list.length === 0 && (
+        <p className="text-sm" style={{ color: 'var(--sonora-dim)' }}>
+          {tracks.length === 0 ? 'No songs yet — import a folder from Home.' : 'No songs match that filter.'}
+        </p>
+      )}
     </div>
   );
 }

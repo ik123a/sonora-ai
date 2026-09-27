@@ -1,5 +1,6 @@
 import { useLibrary } from '../stores/useLibrary';
 import { usePlayer } from '../stores/usePlayer';
+import { PageHead, Tile } from '../components/Tile';
 
 export function Artists() {
   const { tracks } = useLibrary();
@@ -10,17 +11,24 @@ export function Artists() {
     map.get(t.artist)!.push(t);
   }
   return (
-    <div className="space-y-3">
-      <h1 className="text-2xl font-bold">Artists ({map.size})</h1>
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+    <div className="space-y-6">
+      <PageHead title="Artists" count={map.size} />
+      <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {[...map.entries()].map(([name, list]) => (
-          <button key={name} onClick={() => setQueue(list, 0)} className="rounded-xl bg-white/5 p-4 text-left hover:bg-white/10">
-            <div className="truncate font-medium">{name}</div>
-            <div className="truncate text-sm text-gray-400">{list.length} tracks</div>
-          </button>
+          <Tile
+            key={name}
+            aspect="circle"
+            src={list.find((t) => t.artworkUrl)?.artworkUrl}
+            seed={name}
+            title={name}
+            meta={`${list.length} track${list.length === 1 ? '' : 's'}`}
+            onClick={() => setQueue(list, 0)}
+          />
         ))}
       </div>
-      {map.size === 0 && <p className="text-sm text-gray-400">No artists yet.</p>}
+      {map.size === 0 && (
+        <p className="text-sm" style={{ color: 'var(--sonora-dim)' }}>No artists yet.</p>
+      )}
     </div>
   );
 }
