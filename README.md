@@ -1,20 +1,46 @@
-# SONORA AI — Your Music. Your Rules. Your AI.
+# SONORA AI
 
-Ad-free, AI-native, voice-controlled, local-first music player. Tauri v2 + React 19 + TypeScript + SQLite.
+A local-first React/TypeScript music-player prototype with a Tauri desktop shell, Web Audio playback, playlists, lyrics, provider adapters, and configurable AI endpoints.
 
-## Status (Phase 1–4 foundation)
-Real and working: app shell/routing/theme, local folder import + metadata, WebAudio engine (gapless handoff, crossfade, 9-band EQ, visualizer data, media keys), SQLite/IndexedDB persistence, Settings → AI & Providers (multi-provider, test connection), tool-calling agent loop with guardrails, local + MusicBrainz + Jamendo (CC) + Mock providers, search, recommendations, voice via browser speech APIs. Labeled MOCK where mocked. No DRM bypass.
+![Local empty-library screen](docs/screenshots/local-audit.png)
 
-## Run
+Captured from the real local web app on 2026-11-10 at 1440×1000 with a fresh browser context, no imported music, no credentials, and external requests blocked. The screenshot demonstrates the shell and empty state, not playback or a connected provider.
+
+## Run and verify
+
+Use a Node version supported by the locked Vite toolchain (the local audit used Node 24.18.0).
+
 ```sh
 cd frontend
-npm install
-npm run dev
+npm ci --ignore-scripts
+npm run dev -- --host 127.0.0.1
+npm test
 npm run build
+npm run lint
 ```
 
-## Android (APK)
-Host has Android SDK at `D:\Android\Sdk` but no Java/NDK yet. See `docs/ANDROID.md`. Desktop builds first; `npm run tauri android init/build` after installing Java 17 + NDK.
+The audit passed all 9 tests and the TypeScript/Vite production build. Lint exits successfully with an existing LyricsPanel effect warning. Build warnings include bundle size, ineffective dynamic imports, and direct eval in a metadata dependency. The repair makes repeated pause and resume tool commands preserve the requested state instead of toggling it. The mobile AI panel now includes an explicit Close control, and Escape dismisses overlays; the real-browser open/close regression passed. Revert the audit commit to roll back.
 
-## Docs
-ARCHITECTURE.md, DEVELOPMENT.md, API_PROVIDERS.md, AI_AGENT.md, VOICE.md, SECURITY.md, CONTRIBUTING.md, docs/ANDROID.md
+## How the implementation fits together
+
+```mermaid
+flowchart LR
+  UI[React routes and app shell] --> Stores[Zustand library, playlists, player]
+  Stores --> Audio[Web Audio engine]
+  UI --> DB[SQLite in Tauri / IndexedDB in browser]
+  UI --> Agent[Agent command routing]
+  Agent --> Tools[Library and playback tools]
+  Tools --> Stores
+  Agent --> Provider[Configured AI endpoint]
+  UI --> Adapters[Music provider adapters]
+```
+
+The agent handles a small set of local intents and otherwise requests text from a configured provider. The current `runAgent` implementation does not parse arbitrary model tool calls, so the presence of a tool registry is not a general autonomous execution loop. Provider integrations and browser speech APIs depend on their own credentials, availability, and platform support. Mock and gated adapters remain present.
+
+## Boundaries
+
+Browser build/test success does not verify a Tauri desktop installer, Android APK, OS keyring, filesystem permissions, gapless playback, or crossfade quality. This audit did not access personal folders, import or download real music, sign into services, test media keys, or call AI/music providers. Use files you have rights to when testing playback.
+
+AI provider configuration currently persists API keys in browser localStorage. This path is not OS-keyring storage; see [security notes](SECURITY.md) before configuring credentials.
+
+Project notes: [architecture](ARCHITECTURE.md), [development](DEVELOPMENT.md), [providers](API_PROVIDERS.md), [agent](AI_AGENT.md), [voice](VOICE.md), [security](SECURITY.md), and [Android](docs/ANDROID.md). These describe intended capabilities; verify platform-specific claims against the current source and an actual device build.
