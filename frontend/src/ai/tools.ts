@@ -27,7 +27,7 @@ export const tools: ToolDef[] = [
       usePlayer.getState().setQueue(tracks, i);
       return ok(`Playing ${tracks[i].title}`);
     } },
-  { name: 'pause_music', description: 'Pause playback', permission: 'PLAYBACK', dangerous: false, run: async () => { usePlayer.getState().toggle(); return ok('Paused'); } },
+  { name: 'pause_music', description: 'Pause playback', permission: 'PLAYBACK', dangerous: false, run: async () => { if (usePlayer.getState().isPlaying) usePlayer.getState().toggle(); return ok('Paused'); } },
   { name: 'skip_track', description: 'Next track', permission: 'PLAYBACK', dangerous: false, run: async () => { usePlayer.getState().next(); return ok('Skipped'); } },
   { name: 'previous_track', description: 'Previous track', permission: 'PLAYBACK', dangerous: false, run: async () => { usePlayer.getState().prev(); return ok('Went back'); } },
   { name: 'set_volume', description: 'Set volume 0-1', permission: 'PLAYBACK', dangerous: false,
@@ -40,7 +40,7 @@ export const tools: ToolDef[] = [
     run: async (a) => { useLibrary.getState().toggleLike(String(a.trackId)); return ok('Liked'); } },
   { name: 'unlike_song', description: 'Unlike a track', permission: 'PLAYLIST', dangerous: false,
     run: async (a) => { useLibrary.getState().toggleLike(String(a.trackId)); return ok('Unliked'); } },
-  { name: 'resume_music', description: 'Resume playback', permission: 'PLAYBACK', dangerous: false, run: async () => { usePlayer.getState().toggle(); return ok('Resumed'); } },
+  { name: 'resume_music', description: 'Resume playback', permission: 'PLAYBACK', dangerous: false, run: async () => { if (!usePlayer.getState().isPlaying) usePlayer.getState().toggle(); return ok('Resumed'); } },
   { name: 'seek', description: 'Seek seconds', permission: 'PLAYBACK', dangerous: false, run: async (a) => { usePlayer.getState().seek(Number(a.seconds ?? 0)); return ok('Seeked'); } },
   { name: 'shuffle', description: 'Set shuffle', permission: 'PLAYBACK', dangerous: false, run: async (a) => { usePlayer.getState().setShuffle(Boolean(a.on)); return ok('Shuffle updated'); } },
   { name: 'set_repeat_mode', description: 'off/all/one', permission: 'PLAYBACK', dangerous: false, run: async (a) => { usePlayer.getState().setRepeat((a.mode as 'off' | 'all' | 'one') ?? 'off'); return ok('Repeat updated'); } },

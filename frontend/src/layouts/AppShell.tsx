@@ -50,6 +50,7 @@ export function AppShell() {
 
   return (
     <div className="flex h-full" style={{ background: 'var(--sonora-bg)', color: 'var(--sonora-text)' }} onKeyDown={(e) => {
+      if (e.key === 'Escape') { setAiOpen(false); setNavOpen(false); }
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); setPalette(true); }
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'l') { e.preventDefault(); nav('/search'); }
     }}>
@@ -185,7 +186,9 @@ export function AppShell() {
           style={{ borderColor: 'var(--sonora-line)', background: 'var(--sonora-panel)' }}
           aria-label="SONORA AI"
         >
-          <div className="border-b p-4" style={{ borderColor: 'var(--sonora-line)' }}>
+          <div className="relative border-b p-4" style={{ borderColor: 'var(--sonora-line)' }}>
+            <button type="button" className="btn-ghost absolute right-3 top-3 px-3 py-2 lg:hidden"
+              aria-label="Close Sonora AI panel" onClick={() => setAiOpen(false)}>Close</button>
             <div className="font-display text-xl font-semibold uppercase tracking-wide">
               Sonora <span style={{ color: 'var(--sonora-ai)' }}>AI</span>
             </div>
